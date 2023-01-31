@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('doctor_hospital', function (Blueprint $table) {
             $table->id();
-            $table->integer('hospital_id')->unsigned()->nullable();
-            $table->integer('doctor_id')->unsigned()->nullable();
+            $table->foreignId('hospital_id')->constrained()->onDelete('cascade');
+            $table->foreignId('doctor_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
