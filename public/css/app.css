@@ -1,0 +1,27 @@
+* {
+    box-sizing: border-box;
+
+}
+
+/* ::-webkit-scrollbar {
+    display: none;
+} */
+
+
+.nav-link {
+    color: rgb(254, 255, 255);
+}
+
+.sticky-footer {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+.body-layout {
+    width: 100%;
+    min-height: 100vh;
+    background-image: linear-gradient(rgba(43, 43, 43, 0.7), rgba(43, 43, 43, 0.7)), url(/images/bg.jpg);
+    background-position: center;
+    background-size: cover;
+}

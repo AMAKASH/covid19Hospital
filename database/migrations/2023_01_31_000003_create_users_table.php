@@ -19,10 +19,11 @@ return new class extends Migration
             $table->string('username');
             $table->string('email')->unique();
             $table->timestamp('verified_at')->nullable();
-            $table->foreignId('role_id')->constrained()->onDelete('cascade');
+            $table->foreignId('role_id')->constrained()->onDelete('cascade')->default(3);
             $table->string('password');
             $table->string('nid_number')->nullable();
             $table->string('phone_number');
+            $table->boolean('covid_vaccination_status')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

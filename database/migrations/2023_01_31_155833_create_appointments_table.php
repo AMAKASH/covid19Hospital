@@ -15,17 +15,16 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->nullable();
-            $table->integer('hospital_id')->unsigned()->nullable();
-            $table->integer('doctor_id')->unsigned()->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('hospital_id')->constrained()->onDelete('cascade');
+            $table->foreignId('doctor_id');
             $table->string('patient_name', 100);
             $table->string('blood_group', 100)->nullable();
-            $table->string('gender', 1);
+            $table->string('gender', 5);
             $table->integer('weight')->nullable();
             $table->date('dob');
             $table->string('status', 15)->default('Requested');
             $table->text('comments')->nullable();
-            $table->string('test_report_path')->nullable();
             $table->timestamps();
         });
     }

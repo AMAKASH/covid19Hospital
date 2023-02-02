@@ -8,14 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Hospital extends Model
 {
     use HasFactory;
-    protected $fillable = [
-        'name',
-        'user_id',
-        'license_number',
-        'phone_no',
-        'area',
-        'address'
-    ];
+    protected $guarded = [];
 
     public function doctors()
     {
@@ -26,9 +19,17 @@ class Hospital extends Model
     {
         return $this->hasMany(Test::class);
     }
+    public function test_names()
+    {
+        return $this->belongsToMany(TestName::class);
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
     }
 }
