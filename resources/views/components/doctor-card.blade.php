@@ -1,8 +1,8 @@
-@props(['doctor'])
+@props(['doctor', 'width'])
 
 
 
-<div class="card mb-2" style="width: 40%;">
+<div class="card mb-2" style="width: {{ $width ?? '40%' }}">
     <div class="card-body">
         <div title='General Bed' class='icon icon-info d-flex flex-row align-items-center gap-2'>
             <img src="{{ asset('images/icon/doctor.png') }}" alt="" width="25px">

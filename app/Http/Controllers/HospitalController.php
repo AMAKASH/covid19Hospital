@@ -18,7 +18,9 @@ class HospitalController extends Controller
         $areas = Area::orderBy('area_name', 'ASC')->get();
         $search_area = request('search') ?? 'null';
 
-        $verfied_hospitals = DB::select("SELECT * FROM hospitals INNER JOIN areas ON
+        $verfied_hospitals = DB::select("SELECT hospitals.id as id,user_id,hospitals.name as name,address,area_name,
+        general_bed,icu_bed,oxygen_suppply_availability,
+        covid_vaccine_availability FROM hospitals INNER JOIN areas ON
         hospitals.area_id=areas.id INNER JOIN users ON hospitals.user_id=users.id
         WHERE users.verified_at != 'null' AND areas.area_name LIKE '%$search_area%'");
         // return $verfied_hospitals;
@@ -59,7 +61,7 @@ class HospitalController extends Controller
             $hospital_by_doctor = $doctor->hospitals->pluck('id');
             $doctor = $doctor->name;
             $verified_hospitals = $verified_hospitals->whereIn('id', $hospital_by_doctor)->get();
-            $title_text = "'$doctor' is available on the following hospital(s)";
+            $title_text = "'$doctor' has chamber in the following hospital(s)";
         } else {
             $verified_hospitals = $verified_hospitals->get();
         }
@@ -87,9 +89,26 @@ class HospitalController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, User $user)
     {
-        //
+        if (auth()->check() && auth()->user()->role_id == 1);
+        elseif (auth()->user()->role_id != 2 || auth()->user()->role_id != $user->role_id) {
+            abort(403, 'The Requested resource is not authorised');
+        }
+        $inputs = $request->validate([
+            'area_id' => ['required', 'numeric'],
+            'license_number' => ['required'],
+            'address' => ['required', 'string'],
+            'general_bed' => ['required', 'numeric'],
+            'icu_bed' => ['required', 'numeric'],
+            'oxygen_suppply_availability' => ['required', 'string'],
+            'covid_vaccine_availability' => ['required', 'string'],
+        ]);
+
+        $inputs['name'] = $user->name;
+
+        $user->hospital()->create($inputs);
+        return redirect()->route('dashboard')->with('success-msg', 'Hospital Registered successfully!!');
     }
 
     /**
@@ -100,7 +119,14 @@ class HospitalController extends Controller
      */
     public function show(Hospital $hospital)
     {
-        //
+        if (auth()->check() && auth()->user()->role_id == 1);
+        elseif (!$hospital->user->verified_at) {
+            abort(403, 'The Requested resource is not authorised');
+        }
+
+        return view('hospital.show', [
+            'hospital' => $hospital,
+        ]);
     }
 
     /**
@@ -123,7 +149,32 @@ class HospitalController extends Controller
      */
     public function update(Request $request, Hospital $hospital)
     {
-        //
+        $inputs = $request->validate([
+            'general_bed' => ['nullable', 'numeric'],
+            'icu_bed' => ['nullable', 'numeric'],
+            'oxygen_suppply_availability' => ['nullable'],
+            'covid_vaccine_availability' => ['nullable'],
+        ]);
+        $inputs_filtered = array_filter($inputs, function ($v) {
+            return $v != null;
+        });
+
+        //return $inputs_filtered;
+
+        $hospital->update($inputs_filtered);
+
+        return back()->with('success-msg', 'Status updated successfully!!');
+    }
+
+    public function update_test_doctor(Request $request, Hospital $hospital)
+    {
+        $inputs = request()->all();
+        $test_names = array_map('intval', $inputs['test_names']);
+        $doctors = array_map('intval', $inputs['doctors']);
+        $hospital->test_names()->sync($test_names);
+        $hospital->doctors()->sync($doctors);
+
+        return back()->with('success-msg', 'Test names & Doctors updated successfully!!');
     }
 
     /**

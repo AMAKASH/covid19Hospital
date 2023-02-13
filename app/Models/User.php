@@ -25,6 +25,7 @@ class User extends Authenticatable
         'role_id',
         'nid_number',
         'phone_number',
+        'covid_vaccination_status'
     ];
 
     /**
@@ -55,8 +56,18 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Test');
     }
 
+    public function appointments()
+    {
+        return $this->hasMany('App\Models\Appointment');
+    }
+
     public function hospital()
     {
         return $this->hasOne('App\Models\Hospital');
+    }
+
+    public function setUsernameAttribute($value)
+    {
+        $this->attributes['username'] = $value . (User::all()->count() + 1);
     }
 }

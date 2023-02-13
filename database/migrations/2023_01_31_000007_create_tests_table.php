@@ -20,10 +20,10 @@ return new class extends Migration
             $table->foreignId('test_name_id')->constrained()->onDelete('cascade');
             $table->string('patient_name', 100);
             $table->string('blood_group', 100)->nullable();
-            $table->string('gender', 1);
+            $table->string('gender', 5);
             $table->integer('weight')->nullable();
             $table->date('dob');
-            $table->string('status', 15)->default('Requested');
+            $table->string('status', 20)->default('Requested');
             $table->text('comments')->nullable();
             $table->string('test_report_path')->nullable();
             $table->timestamps();

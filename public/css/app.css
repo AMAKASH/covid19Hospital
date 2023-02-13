@@ -3,13 +3,23 @@
 
 }
 
+:root {
+    --nav-color: #4da5ee;
+}
+
 /* ::-webkit-scrollbar {
     display: none;
 } */
 
+nav {
+    background-color: var(--nav-color);
+}
+
+
+
 
 .nav-link {
-    color: rgb(254, 255, 255);
+    color: aliceblue;
 }
 
 .sticky-footer {
@@ -21,7 +31,65 @@
 .body-layout {
     width: 100%;
     min-height: 100vh;
-    background-image: linear-gradient(rgba(43, 43, 43, 0.7), rgba(43, 43, 43, 0.7)), url(/images/bg.jpg);
+    /* background-image: linear-gradient(rgba(43, 43, 43, 0.7), rgba(43, 43, 43, 0.7)), url(/images/bg.jpg); */
+    background-image: url(/images/bg.jpg);
     background-position: center;
     background-size: cover;
+}
+
+.divider:after,
+.divider:before {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #eee;
+}
+
+.h-custom {
+    height: calc(100% - 73px);
+}
+
+@media (max-width: 450px) {
+    .h-custom {
+        height: 100%;
+    }
+}
+
+.link-primary {
+    color: #2c99e7;
+}
+
+.btn-primary {
+    background-color: #2c99e7;
+}
+
+.box-shadow {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px #000000;
+}
+
+.nav-button {
+    background-color: var(--nav-color);
+    box-shadow: none;
+}
+
+.nav-button:hover {
+    background-color: var(--nav-color);
+}
+
+.nav-button.show:hover {
+    background-color: var(--nav-color);
+}
+
+.nav-button.show {
+    background-color: var(--nav-color);
 }

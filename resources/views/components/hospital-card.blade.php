@@ -4,7 +4,7 @@
 
 <div class="card mb-2" style="width: 40%;">
     <div class="card-body">
-        <a href="#" class="text-decoration-none">
+        <a href="{{ route('hospital.show', $hospital->id) }}" class="text-decoration-none">
             <h5 class="card-title">{{ $hospital->name ?? 'Hospital Name' }} </h5>
         </a>
         @if ($hospital->area_name)
@@ -38,7 +38,7 @@
             <p class="card-text">{{ $hospital->address }}</p>
         </div>
 
-        <a href="#" class="card-link">Request a Test</a>
-        <a href="#" class="card-link">Get Appointment</a>
+        <a href="{{ route('test.create', $hospital->id) }}" class="card-link">Request a Test</a>
+        <a href="{{ route('appointment.create', $hospital->id) }}" class="card-link">Get Appointment</a>
     </div>
 </div>

@@ -19,6 +19,10 @@ class Hospital extends Model
     {
         return $this->hasMany(Test::class);
     }
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
     public function test_names()
     {
         return $this->belongsToMany(TestName::class);

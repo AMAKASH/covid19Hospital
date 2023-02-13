@@ -7,11 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="{{ asset('images/icon/favicon.ico') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
-    </script>
+    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> --}}
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.1.0/mdb.min.css" rel="stylesheet" />
+
 
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @yield('styles')
@@ -21,7 +25,8 @@
 
 <body>
     <div class="body-layout">
-        <nav class="navbar navbar-expand-lg navbar" style="background-color: #2c99e7;">
+        <nav class="navbar-expand-lg navbar ">
+            {{-- <nav class="navbar navbar-expand-lg navbar" style="background-color: #2c99e7;"> --}}
             <div class="container-fluid">
                 <a class="navbar-brand text-white ms-5" href="{{ route('landing') }}">
                     <svg height="60px" width="40px" version="1.1" id="logo_1" xmlns="http://www.w3.org/2000/svg"
@@ -54,22 +59,44 @@
             <div class="d-flex">
                 <div class="collapse navbar-collapse" id="navbarNavDropdown">
                     <ul class="navbar-nav fs-5 fw-bold gap-2 me-3 text-white">
-                        <li class="nav-item">
+                        <li class="nav-item active">
                             <a class="nav-link" aria-current="page" href="{{ route('landing') }}">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('hospital.index') }}">Hospitals</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('doctors.index') }}">Doctors</a>
+                            <a class="nav-link" href="{{ route('doctor.index') }}">Doctors</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('tests.index') }}">Tests</a>
+                            <a class="nav-link" href="{{ route('test.index') }}">Tests</a>
                         </li>
                         @if (auth()->check())
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Dashboard</a>
+                            <li class="nav-item dropdown ">
+                                <div class="btn btn-primary nav-button dropdown-toggle" type="button"
+                                    id="dropdownMenuButton" data-mdb-toggle="dropdown" aria-expanded="false">
+                                    <img src="{{ asset('images/icon/user.png') }}" alt="" width="30px">
+                                </div>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li class="dropdown-item">{{ auth()->user()->name }}</li>
+                                    <li><a class="dropdown-item" href="{{ route('dashboard') }}">Dashboard</a></li>
+                                    <li>
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item">Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </li>
+                            {{-- <li class="nav-item">
+                                <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-danger mt-2">Logout</button>
+                                </form>
+                            </li> --}}
                         @else
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('login') }}">Login</a>
@@ -84,7 +111,6 @@
             </div>
         </nav>
         @yield('content')
-        @yield('scripts')
 
     </div>
     <footer class="footer mt-auto py-3 bg-light text-center">
@@ -92,6 +118,14 @@
             <span class="text-muted">&copy; {{ now()->year }} Covid 19 Hospital</span>
         </div>
     </footer>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+    </script> --}}
+
+    <!-- MDB -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.1.0/mdb.min.js"></script>
+    @yield('scripts')
+
 </body>
 
 </html>
