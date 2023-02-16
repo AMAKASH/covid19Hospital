@@ -34,7 +34,12 @@
         <td>{{ $test->weight }}</td>
         <td>{{ $test->age() }}</td>
         <td>{{ $test->status }}</td>
-        <td><a href="{{ route('test.download', $test->id) }}">Download</a></td>
+        <td>
+            @if ($test->test_report_path)
+                <a href="{{ route('test.download', $test->id) }}">Download</a>
+        </td>
+        @endif
+
         <td>
             <p>{{ $test->comments }}</p>
         </td>

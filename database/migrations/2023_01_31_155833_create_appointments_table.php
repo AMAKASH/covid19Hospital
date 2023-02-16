@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('doctor_id');
             $table->string('patient_name', 100);
             $table->string('blood_group', 100)->nullable();
-            $table->string('gender', 5);
+            $table->string('gender', 10);
             $table->integer('weight')->nullable();
             $table->date('dob');
             $table->string('status', 15)->default('Requested');
