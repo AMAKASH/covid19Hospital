@@ -36,4 +36,9 @@ class Hospital extends Model
     {
         return $this->belongsTo(Area::class);
     }
+
+    public function notices()
+    {
+        return $this->hasMany(Notice::class);
+    }
 }
