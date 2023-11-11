@@ -32,6 +32,14 @@
                 <img src="{{ asset('images/icon/001-vaccine.png') }}" alt="" width="30px">
                 <span>{{ $hospital->covid_vaccine_availability }}</span>
             </div>
+            <div title='Ambulance Service' class='icon icon-info d-flex flex-row align-items-center gap-2'>
+                <img src="{{ asset('images/icon/ambulance.png') }}" alt="" width="30px">
+                @if ($hospital->ambulance == null)
+                    <span>Not Available</span>
+                @else
+                    <span>{{ $hospital->ambulance }}</span>
+                @endif
+            </div>
         </div>
         <div title='Address' class='icon icon-info my-3 d-flex flex-row align-items-center gap-3'>
             <img src="{{ asset('images/icon/map.png') }}" alt="" width="30px">

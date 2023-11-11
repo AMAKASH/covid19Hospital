@@ -8,6 +8,12 @@
             height: 150px;
         }
     </style>
+
+    <!-- Font Awesome CSS -->
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css'>
+
+    <!-- Vanilla Datepicker CSS -->
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
 @endsection
 @section('content')
     <div class='container-fluid bg-white h-100 w-75 rounded-3 p-4'>
@@ -124,6 +130,17 @@
                         <x-input-error :messages="$errors->get('covid_vaccine_availability')" class="mb-2" autofocus />
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <!-- name input -->
+                    <div class="form-outline mb-4">
+                        <input type="text" id="ambulance"
+                            class="form-control form-control-lg {{ $errors->get('ambulance') ? 'is-invalid' : '' }}"
+                            name="ambulance" value="{{ $hospital->ambulance }}" />
+                        <label class="form-label" for="ambulance">Ambulance Service (Enter Contact Info of Ambulance or keep
+                            blank )</label>
+                    </div>
+                    <x-input-error :messages="$errors->get('ambulance')" class="mb-2" autofocus />
+                </div>
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Update Status</button>
                 </div>
@@ -179,9 +196,9 @@
                             @foreach ($test_names as $names)
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="{{ $names->id }}"
-                                        id="{{ 'check_' . $names->id }}" name='test_names[]'
+                                        id="{{ 't_check_' . $names->id }}" name='test_names[]'
                                         {{ $names->checked ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="{{ 'check_' . $names->id }}">
+                                    <label class="form-check-label" for="{{ 't_check_' . $names->id }}">
                                         {{ $names->name }}
                                     </label>
                                 </div>
@@ -211,19 +228,149 @@
             </form>
 
         </div>
+        <x-notices-table :entity="$hospital" show_action='true' />
+
+        <h4 class="mt-5">Registered Patients for Vaccination</h4>
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">First Dose</th>
+                    <th scope="col">Second Dose</th>
+                    <th scope="col">Additinal Dose</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($hospital->registered_patients() as $patient)
+                    <tr>
+                        <th scope="row">{{ $loop->index + 1 }}</th>
+                        <td>{{ $patient->name }}</td>
+                        @if ($patient->first_dose != '')
+                            <td>{{ date('d-m-Y', strtotime($patient->first_dose)) }}</td>
+                        @else
+                            <td>Not Administered</td>
+                        @endif
+                        @if ($patient->second_dose != '')
+                            <td>{{ date('d-m-Y', strtotime($patient->second_dose)) }}</td>
+                        @else
+                            <td>Not Administered</td>
+                        @endif
+                        @if ($patient->additional_dose != '')
+                            <td>{{ date('d-m-Y', strtotime($patient->additional_dose)) }}</td>
+                        @else
+                            <td>Not Administered</td>
+                        @endif
+                    </tr>
+                @endforeach
+                @if (count($hospital->registered_patients()) == 0)
+                    <tr>
+                        <td colspan='5'>
+                            <h6 class="text-center">No Patients available</h6>
+                        </td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
+        <h6 class="mt-5">Update Status</h6>
+        <form action="" method="POST" id="vac_info_form">
+            @csrf
+
+            <div class="d-flex flex-row col-md-11 mx-auto">
+                <div class="col-md-4">
+                    <!-- status input -->
+                    <select class="form-select mb-4 {{ $errors->get('vac_patient') ? 'is-invalid' : '' }}"
+                        aria-label="Vaccination Patient Name" name="vac_patient" id='vac_patient'>
+                        <option value="" selected>Select Patient Name</option>
+                        @foreach ($hospital->registered_patients() as $patient)
+                            <option value="{{ $patient->id }}">{{ $patient->name }}</option>
+                        @endforeach
+                    </select>
+
+
+                </div>
+                <div class="col-md-4">
+                    <!-- status input -->
+                    <select class="form-select mb-4 ms-2 {{ $errors->get('vac_dose') ? 'is-invalid' : '' }}"
+                        aria-label="Vaccination Dose" name="vac_dose" id="vac_dose">
+                        <option value="" selected> Select Vaccine Dose </option>
+                        <option value="first_dose">First Dose</option>
+                        <option value="second_dose">Last Dose</option>
+                        <option value="additional_dose">Additional Dose</option>
+                    </select>
+
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group mb-4 ms-3">
+                        <i class="bi bi-calendar-date input-group-text"></i>
+                        <input type="text"
+                            class="datepicker_input form-control {{ $errors->get('dov') ? 'is-invalid' : '' }}"
+                            name='dov' placeholder="Date (yyyy-mm-dd)" value="{{ old('dov') }}"
+                            aria-label="Date of Vaccination">
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-12 text-center">
+                <button class="btn btn-primary" onclick="UpdateVac()">Update</button>
+                <button class="btn btn-primary" onclick="NotifyVac()">Send Email</button>
+            </div>
+        </form>
+
         <x-test-table :entity="$hospital" show_view='true' />
 
         <x-appointment-table :entity="$hospital" show_view='true' />
     </div>
 @endsection
 @section('scripts')
+    <script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
     <script>
+        vac_form = document.getElementById('vac_info_form')
+
         function showPasswordForm() {
             button = document.getElementById('passwordUpdateButton');
             button.classList.add('d-none')
             button.classList.remove('mt-3')
             form = document.getElementById('passwordUpdateForm');
             form.classList.remove('d-none')
+        }
+
+        function UpdateVac() {
+            console.log('UpdateVac')
+            vac_form.action = "{{ route('update_vac') }}";
+            vac_form.submit();
+        }
+
+        function NotifyVac() {
+            console.log('NotifyVac')
+            vac_form.action = "{{ route('notify_vac') }}";
+            vac_form.submit();
+        }
+
+        /* Bootstrap 5 JS included */
+        /* vanillajs-datepicker 1.1.4 JS included */
+
+        const getDatePickerTitle = elem => {
+            // From the label or the aria-label
+            const label = elem.nextElementSibling;
+            let titleText = '';
+            if (label && label.tagName === 'LABEL') {
+                titleText = label.textContent;
+            } else {
+                titleText = elem.getAttribute('aria-label') || '';
+            }
+            return titleText;
+        }
+
+        const elems = document.getElementsByClassName('datepicker_input');
+        for (const elem of elems) {
+            console.log('Flag 1')
+            const datepicker = new Datepicker(elem, {
+                'format': 'yyyy-mm-dd',
+                title: getDatePickerTitle(elem)
+            });
         }
     </script>
 @endsection

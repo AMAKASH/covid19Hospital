@@ -9,6 +9,7 @@ use App\Models\Hospital;
 use App\Models\TestName;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class HospitalController extends Controller
 {
@@ -154,10 +155,15 @@ class HospitalController extends Controller
             'icu_bed' => ['nullable', 'numeric'],
             'oxygen_suppply_availability' => ['nullable'],
             'covid_vaccine_availability' => ['nullable'],
+            'ambulance' => ['nullable']
         ]);
         $inputs_filtered = array_filter($inputs, function ($v) {
             return $v != null;
         });
+
+        if ($inputs['ambulance'] == null) {
+            $inputs_filtered['ambulance'] = null;
+        }
 
         //return $inputs_filtered;
 
@@ -186,5 +192,54 @@ class HospitalController extends Controller
     public function destroy(Hospital $hospital)
     {
         //
+    }
+
+    public function sendReminder(Hospital $hospital, User $user)
+    {
+        $data = [];
+        if ($user->first_dose == null) {
+            $data['dose'] = 'First';
+            $data['date'] = date('d/m/Y', strtotime('+7 days'));
+        } elseif ($user->second_dose == null) {
+            $data['dose'] = 'Second';
+            $data['date'] = date('d/m/Y', strtotime($user->first_dose . ' +60 days'));
+            //return $data['date'];
+        } else {
+            $data['dose'] = 'Additional';
+            $data['date'] = Date('d/m/Y', strtotime('+7 days'));
+        }
+        $data['user'] = $user;
+        $data['date'] = date_create($data['date']);
+        $data['title'] = 'Vaccine Reminder Notification';
+        $data['hospital'] = $hospital;
+
+        Mail::send('mail.vaccine-notify-template', $data, function ($message) use ($user) {
+            $message->to($user->email, $user->name)->subject('Vaccine Reminder Notification');
+        });
+
+        return "Mail Send Success!";
+    }
+
+    public function sendVacReminder()
+    {
+        $inputs = request()->validate([
+            'vac_patient' => ['string',],
+            'vac_dose' => ['string'],
+            'dov' => ['string'],
+        ]);
+
+        $user = User::find($inputs['vac_patient']);
+        //dd($inputs);
+        $data['user'] = $user;
+        $data['dose'] = ucfirst(explode("_", $inputs['vac_dose'])[0]);
+        $data['date'] = $inputs['dov'];
+        $data['title'] = 'Vaccine Reminder Notification';
+        $data['hospital'] = $user->registered_vac_hospital();
+
+        Mail::send('mail.vaccine-notify-template', $data, function ($message) use ($user) {
+            $message->to($user->email, $user->name)->subject('Vaccine Reminder Notification');
+        });
+
+        return back()->with('success-msg', "Notifiaction sent to $user->name successfully ");
     }
 }

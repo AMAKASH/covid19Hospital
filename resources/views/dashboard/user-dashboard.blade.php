@@ -138,9 +138,43 @@
                     <button type="submit" class="btn btn-primary">Update Password</button>
                 </div>
             </form>
-
-
         </div>
+        <h2 class="text-center pt-3 mb-3">Vaccination Info</h2>
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Current Register Hospital</th>
+                    <th scope="col">First Dose</th>
+                    <th scope="col">Second Dose</th>
+                    <th scope="col">Additinal Dose</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <td>{{ $user->registered_vac_hospital()->name }}</td>
+                @if ($user->first_dose != '')
+                    <td>{{ date('d-m-Y', strtotime($user->first_dose)) }}</td>
+                @else
+                    <td>Not Administered</td>
+                @endif
+                @if ($user->second_dose != '')
+                    <td>{{ date('d-m-Y', strtotime($user->second_dose)) }}</td>
+                @else
+                    <td>Not Administered</td>
+                @endif
+                @if ($user->additional_dose != '')
+                    <td>{{ date('d-m-Y', strtotime($user->additional_dose)) }}</td>
+                @else
+                    <td>Not Administered</td>
+                @endif
+                <td><button class="btn btn-danger" onclick="unregisterVac()"
+                        @if ($user->registered_vac_hospital()->name == 'Not Registered') disabled @endif>Unregister</button>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+
         <x-test-table :entity="$user" />
 
         <x-appointment-table :entity="$user" />
@@ -148,6 +182,10 @@
 @endsection
 @section('scripts')
     <script>
+        function unregisterVac() {
+            window.location.href = "{{ route('unregister_vaccine') }}";
+        }
+
         function showUpdateForm() {
             button = document.getElementById('infoUpdateButton');
             button.classList.add('d-none')

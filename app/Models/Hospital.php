@@ -41,4 +41,9 @@ class Hospital extends Model
     {
         return $this->hasMany(Notice::class);
     }
+
+    public function registered_patients()
+    {
+        return User::where('registered_vac_hospital', $this->id)->get();
+    }
 }

@@ -70,4 +70,15 @@ class User extends Authenticatable
     {
         $this->attributes['username'] = $value . (User::all()->count() + 1);
     }
+
+    public function registered_vac_hospital()
+    {
+        $hos_id = $this->registered_vac_hospital;
+        $hos = Hospital::find($hos_id);
+        if ($hos == null) {
+            return new Hospital(['name' => "Not Registered"]);
+        } else {
+            return $hos;
+        }
+    }
 }

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Area;
 use App\Models\Doctor;
+use App\Models\Hospital;
 use App\Models\TestName;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Validation\Rules;
 
 class BaseController extends Controller
@@ -101,7 +103,33 @@ class BaseController extends Controller
     {
         return view('dashboard.admin-dashboard', [
             'user' => $user,
+            'patients' => User::where('role_id', 3)->get(),
+            'hospitals' => Hospital::all()
         ]);
+    }
+
+    public function approve_hospital(Hospital $hospital)
+    {
+        $user = auth()->user();
+        if ($user->role_id != 1) {
+            return abort(403, "Access Restricted");
+        }
+        $hospital_user = $hospital->user;
+        $hospital_user->verified_at = Carbon::now();
+        $hospital_user->save();
+        return back()->with('success-msg', "$hospital->name approved");
+    }
+
+    public function reject_hospital(Hospital $hospital)
+    {
+        $user = auth()->user();
+        if ($user->role_id != 1) {
+            return abort(403, "Access Restricted");
+        }
+        $hospital_user = $hospital->user;
+        $hospital_user->verified_at = null;
+        $hospital_user->save();
+        return back()->with('success-msg', "$hospital->name rejected");
     }
 
     public function user_update()
@@ -134,5 +162,36 @@ class BaseController extends Controller
         $user->password = bcrypt($input['password']);
         $user->save();
         return redirect()->route('dashboard')->with('success-msg', 'Password Updated successfully');
+    }
+
+    public function unreg_vaccine()
+    {
+        $user = auth()->user();
+        $user->registered_vac_hospital = 0;
+        $user->save();
+        return redirect()->route('dashboard')->with('success-msg', 'Successfully Unregistered');
+    }
+
+    public function reg_vaccine(int $hospital_id)
+    {
+        $user = auth()->user();
+        $user->registered_vac_hospital = $hospital_id;
+        $user->save();
+        return redirect()->route('dashboard')->with('success-msg', 'Successfully Registered for vaccination');
+    }
+
+    public function update_vaccine_info()
+    {
+        $inputs = request()->validate([
+            'vac_patient' => ['string',],
+            'vac_dose' => ['string'],
+            'dov' => ['date',],
+        ]);
+
+        $user = User::find($inputs['vac_patient']);
+        $user[$inputs['vac_dose']] = $inputs['dov'] == "" ? " " : date($inputs['dov']);
+        $user->save();
+
+        return back()->with('success-msg', 'Vaccine Information updated successfully!!');
     }
 }

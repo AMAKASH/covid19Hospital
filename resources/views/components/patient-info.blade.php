@@ -51,7 +51,7 @@
 <div class="col-md-6">
     <div class="input-group mb-4">
         <i class="bi bi-calendar-date input-group-text"></i>
-        <input type="text" class="datepicker_input form-control {{ $errors->get('gender') ? 'is-invalid' : '' }}"
+        <input type="text" class="datepicker_input form-control {{ $errors->get('dob') ? 'is-invalid' : '' }}"
             name='dob' placeholder="Enter Date of Birth (yyyy-mm-dd)" value="{{ old('dob') }}"
             aria-label="Date of Birth">
     </div>

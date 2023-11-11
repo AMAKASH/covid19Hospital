@@ -29,15 +29,39 @@
                         <img src="{{ asset('images/icon/001-vaccine.png') }}" alt="" width="30px">
                         <span>{{ $hospital->covid_vaccine_availability }}</span>
                     </div>
+                    <div title='Ambulance Service' class='icon icon-info d-flex flex-row align-items-center gap-2'>
+                        <img src="{{ asset('images/icon/ambulance.png') }}" alt="" width="30px">
+                        @if ($hospital->ambulance == null)
+                            <span>Not Available</span>
+                        @else
+                            <span>{{ $hospital->ambulance }}</span>
+                        @endif
+                    </div>
                 </div>
                 <div title='Address' class='icon icon-info my-3 d-flex flex-row align-items-center gap-3'>
                     <img src="{{ asset('images/icon/map.png') }}" alt="" width="30px">
                     <p class="card-text">{{ $hospital->address }}</p>
                 </div>
+
                 <div class="mt-4">
                     <a href="{{ route('test.create', $hospital->id) }}" class="card-link">Request a Test</a>
                     <a href="{{ route('appointment.create', $hospital->id) }}" class="card-link">Get Appointment</a>
+                    @if (auth()->check() && auth()->user()->role_id == 3 && auth()->user()->registered_vac_hospital == $hospital->id)
+                        <span class="card-subtitle mx-5">
+                            Registered for Vaccination
+                        </span>
+                    @elseif (auth()->check() && auth()->user()->role_id == 3 && $hospital->covid_vaccine_availability == 'Yes')
+                        <a href="{{ route('register_vaccine', $hospital->id) }}" class="card-link">Register for
+                            Vaccination</a>
+                    @elseif(!auth()->check() && $hospital->covid_vaccine_availability == 'Yes')
+                        <span class="card-subtitle mx-3">
+                            Login to Register For vaccination
+                        </span>
+                    @endif
                 </div>
+
+                <x-notices-table :entity="$hospital" />
+
                 <h4 class="mt-5 mb-2 mx-1">List of Tests:</h4>
                 @if (!$hospital->test_names)
                     <p class="text-center my-4">There are no test avaible in this hospital</p>
