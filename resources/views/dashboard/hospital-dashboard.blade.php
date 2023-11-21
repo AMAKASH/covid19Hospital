@@ -227,6 +227,63 @@
                 </div>
             </form>
 
+            <h4 class="mt-5">Update Test Cost:</h4>
+
+            @foreach ($test_names as $names)
+                @if ($names->checked)
+                    <form action="{{ route('update-test-cost', $names->id) }}" method="post" class="mt-1">
+                        @csrf
+                        @method('patch')
+                        <div class="d-flex flex-row ">
+                            <div class="col-md-6">
+                                <!-- name input -->
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="test_{{ $names->id }}_cost"
+                                        class="form-control form-control-lg
+                                {{ $errors->get('cost') ? 'is-invalid' : '' }}"
+                                        name="cost" value="{{ $names->cost }}" />
+                                    <label class="form-label" for="test_{{ $names->id }}_cost">{{ $names->name }}
+                                        Cost</label>
+                                </div>
+                                <x-input-error :messages="$errors->get('cost')" class="mb-2" autofocus />
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                @endif
+            @endforeach
+
+            <h4 class="mt-5">Update Doctor Fees:</h4>
+
+            @foreach ($doctors as $doctor)
+                @if ($doctor->checked)
+                    <form action="{{ route('update-doctor-fees', $doctor->id) }}" method="post" class="mt-1">
+                        @csrf
+                        @method('patch')
+                        <div class="d-flex flex-row ">
+                            <div class="col-md-6">
+                                <!-- name input -->
+                                <div class="form-outline mb-4">
+                                    <input type="text" id="doc_{{ $doctor->id }}_fees"
+                                        class="form-control form-control-lg
+                                {{ $errors->get('fees') ? 'is-invalid' : '' }}"
+                                        name="fees" value="{{ $doctor->fees }}" />
+                                    <label class="form-label" for="doc_{{ $doctor->id }}_fees">{{ $doctor->name }}
+                                        Fee</label>
+                                </div>
+                                <x-input-error :messages="$errors->get('fees')" class="mb-2" autofocus />
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                @endif
+            @endforeach
+
+
         </div>
         <x-notices-table :entity="$hospital" show_action='true' />
 

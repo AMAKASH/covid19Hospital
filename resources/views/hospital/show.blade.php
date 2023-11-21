@@ -73,6 +73,7 @@
                                 class="text-decoration-none">
                                 <h5>{{ $test->name }}</h5>
                             </a>
+                            <h6>Cost: Tk {{ $test->cost($hospital->id) }}</h6>
                         </li>
                     @endforeach
                 </ul>
@@ -82,7 +83,7 @@
                 @endif
                 <div class="mt-3">
                     @foreach ($hospital->doctors()->orderBy('name')->get() as $doctor)
-                        <x-doctor-card :doctor="$doctor" width="80%" />
+                        <x-doctor-card :doctor="$doctor" width="80%" :hospital="$hospital" />
                     @endforeach
                 </div>
             </div>

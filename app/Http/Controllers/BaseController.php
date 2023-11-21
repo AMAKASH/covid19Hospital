@@ -9,6 +9,7 @@ use App\Models\TestName;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\DB;
 
 class BaseController extends Controller
 {
@@ -76,6 +77,16 @@ class BaseController extends Controller
         }
         $allDoctors = Doctor::orderBy('name')->get();
         $doctorIdInHospital = $hospital->doctors()->pluck('doctors.id')->toArray();
+        $doctorWithPrice = DB::select("SELECT * FROM doctor_hospital WHERE hospital_id=$hospital->id");
+
+        foreach ($doctorWithPrice as $doc_price) {
+            foreach ($allDoctors as $doctor) {
+                if ($doctor->id == $doc_price->doctor_id) {
+                    $doctor->fees = $doc_price->fees;
+                }
+            }
+        }
+
         foreach ($allDoctors as $doctor) {
             if (in_array($doctor->id, $doctorIdInHospital)) {
                 $doctor->checked = true;
@@ -84,11 +95,23 @@ class BaseController extends Controller
 
         $test_names = TestName::orderBy('name')->get();
         $testNameIdInHospital = $hospital->test_names()->pluck('test_names.id')->toArray();
+        $testNameWithPrice = DB::select("SELECT * FROM hospital_test_name WHERE hospital_id=$hospital->id");
+
         foreach ($test_names as $test_name) {
             if (in_array($test_name->id, $testNameIdInHospital)) {
                 $test_name->checked = true;
             }
         }
+
+        foreach ($testNameWithPrice as $test_name_price) {
+            foreach ($test_names as $test_name) {
+                if ($test_name->id == $test_name_price->test_name_id) {
+                    $test_name->cost = $test_name_price->cost;
+                }
+            }
+        }
+
+        //dd($test_name);
 
 
         return view('dashboard.hospital-dashboard', [
@@ -193,5 +216,42 @@ class BaseController extends Controller
         $user->save();
 
         return back()->with('success-msg', 'Vaccine Information updated successfully!!');
+    }
+
+    public function contact_us()
+    {
+        return view('contact-us', []);
+    }
+
+    public function update_test_cost(TestName $test_name)
+    {
+        $hospital = auth()->user()->hospital;
+
+        $inputs = request()->validate([
+            'cost' => ['numeric', 'required'],
+        ]);
+
+        $cost = $inputs['cost'];
+
+        DB::statement("UPDATE hospital_test_name SET cost=$cost WHERE
+        hospital_id=$hospital->id AND test_name_id=$test_name->id");
+
+        return back()->with('success-msg', "Updated $test_name->name cost successfully");
+    }
+
+    public function update_doctor_fees(Doctor $doctor)
+    {
+        $hospital = auth()->user()->hospital;
+
+        $inputs = request()->validate([
+            'fees' => ['numeric', 'required'],
+        ]);
+
+        $fees = $inputs['fees'];
+
+        DB::statement("UPDATE doctor_hospital SET fees=$fees WHERE
+        hospital_id=$hospital->id AND doctor_id=$doctor->id");
+
+        return back()->with('success-msg', "Updated $doctor->name fees successfully");
     }
 }

@@ -21,7 +21,7 @@ class HospitalController extends Controller
 
         $verfied_hospitals = DB::select("SELECT hospitals.id as id,user_id,hospitals.name as name,address,area_name,
         general_bed,icu_bed,oxygen_suppply_availability,
-        covid_vaccine_availability FROM hospitals INNER JOIN areas ON
+        covid_vaccine_availability, ambulance FROM hospitals INNER JOIN areas ON
         hospitals.area_id=areas.id INNER JOIN users ON hospitals.user_id=users.id
         WHERE users.verified_at != 'null' AND areas.area_name LIKE '%$search_area%'");
         // return $verfied_hospitals;

@@ -35,6 +35,7 @@ require __DIR__ . '/auth.php';
 Route::middleware('web')->group(function () {
     Route::get('/', [BaseController::class, 'index'])->name('landing');
     Route::post('/search', [HospitalController::class, 'search'])->name('hospital.search');
+    Route::get('/contact-us', [BaseController::class, 'contact_us'])->name('contact-us');
     Route::get('/hospitals', [HospitalController::class, 'index'])->name('hospital.index');
     Route::get('/hospital/{hospital}', [HospitalController::class, 'show'])->name('hospital.show');
     Route::get('/tests', [BaseController::class, 'index_test_name'])->name('test.index');
@@ -59,6 +60,10 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::patch('/hospital/{hospital}', [HospitalController::class, 'update'])->name('hospital.update');
     Route::patch('/hospital/{hospital}/test_doctor', [HospitalController::class, 'update_test_doctor'])
         ->name('hospital.update_test_doctor');
+    Route::patch('/update-test-cost/{test_name}', [BaseController::class, 'update_test_cost'])
+        ->name('update-test-cost');
+    Route::patch('/update-doctor-fees/{doctor}', [BaseController::class, 'update_doctor_fees'])
+        ->name('update-doctor-fees');
     Route::post('/hospital/store/{user}', [HospitalController::class, 'store'])->name('hospital.store');
     Route::get('hospital/approve/{hospital}', [BaseController::class, 'approve_hospital'])->name('hospital.approve');
     Route::get('hospital/reject/{hospital}', [BaseController::class, 'reject_hospital'])->name('hospital.reject');

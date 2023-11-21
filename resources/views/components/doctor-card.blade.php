@@ -1,4 +1,4 @@
-@props(['doctor', 'width'])
+@props(['doctor', 'width', 'hospital' => null])
 
 
 
@@ -16,6 +16,8 @@
             <img src="{{ asset('images/icon/stethoscope.png') }}" alt="" width="30px">
             <h6 class="card-text" style="color:#b30a0a;">{{ $doctor->specialty }}</h6>
         </div>
-
+        @if ($hospital != null)
+            <h6 title='Fee' class="card-subtitle my-2  text-muted">Fee: Tk. {{ $doctor->fees($hospital->id) }}</h6>
+        @endif
     </div>
 </div>
